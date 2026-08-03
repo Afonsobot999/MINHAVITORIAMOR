@@ -133,6 +133,46 @@ p {
   background: #b73b5e;
   transform: translateY(-2px);
 }
+
+/* NOVOS ESTILOS DO BOTÃO DE AMEI */
+.like-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.btn-like {
+  background: transparent;
+  border: 2px solid #d14d72;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 18px;
+  color: #d14d72;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-like:hover {
+  background: #d14d72;
+  color: white;
+  transform: scale(1.05);
+}
+
+#contadorAmei {
+  font-size: 18px;
+  color: #d14d72;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 5px 12px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
 </style>
 </head>
 <body>
@@ -160,6 +200,7 @@ document.addEventListener("click", (e) => {
 
   boom.style.left = e.clientX + "px";
   boom.style.top = e.clientY + "px";
+  boom.style.bottom = "auto"; /* Corrige o conflito de posição */
   boom.style.position = "absolute";
   boom.style.animationDuration = (1 + Math.random()) + "s";
   boom.style.fontSize = (15 + Math.random() * 25) + "px";
@@ -169,7 +210,7 @@ document.addEventListener("click", (e) => {
 });
 </script>
 
-<button id="startBtn" class="start">
+<button id="startBtn" class="start" aria-label="Abrir mensagem surpresa">
 <span class="dog-emoji">🐶</span>
 </button>
 
@@ -183,6 +224,13 @@ Criei este site para guardar todos os detalhes que eu amo em você. Cada vez que
 
 <button onclick="novaFrase()" class="btn">Nova frase</button>
 <p id="frase"></p>
+
+<!-- NOVO: BOTÃO E CONTADOR DE AMEI -->
+<div class="like-container">
+  <button id="btnAmei" class="btn-like">❤️ Amei</button>
+  <span id="contadorAmei">0</span>
+</div>
+
 </div>
 
 <script>
@@ -205,8 +253,18 @@ const frases = [
 "O mundo lá fora é barulhento demais, mas o seu abraço é o único lugar que tem o silêncio e a paz que eu preciso."
 ];
 
+// VARIÁVEL PARA EVITAR REPETIÇÃO
+let ultimaFrase = "";
+
 function novaFrase() {
-  const escolhida = frases[Math.floor(Math.random() * frases.length)];
+  let escolhida = frases[Math.floor(Math.random() * frases.length)];
+  
+  // CONTINUA SORTEANDO ATÉ SER DIFERENTE DA ÚLTIMA
+  while (escolhida === ultimaFrase) {
+    escolhida = frases[Math.floor(Math.random() * frases.length)];
+  }
+  
+  ultimaFrase = escolhida; // Salva a nova frase para a próxima rodada
   document.getElementById('frase').innerText = escolhida;
 }
 
@@ -231,6 +289,7 @@ function coracoesExplodindoCentro() {
 
     heart.style.left = "50vw";
     heart.style.top = "50vh";
+    heart.style.bottom = "auto"; /* Corrige o conflito de posição */
     heart.style.position = "fixed";
     heart.style.animationDuration = (1 + Math.random()) + "s";
     heart.style.fontSize = (20 + Math.random() * 40) + "px";
@@ -239,6 +298,15 @@ function coracoesExplodindoCentro() {
     setTimeout(() => heart.remove(), 2000);
   }
 }
+
+// LÓGICA DO CONTADOR DE AMEI
+let curtidas = 0;
+document.getElementById('btnAmei').addEventListener('click', (e) => {
+  e.stopPropagation(); // Evita que o clique do botão dispare o clique da tela toda junto
+  curtidas++;
+  document.getElementById('contadorAmei').innerText = curtidas;
+  coracoesExplodindoCentro(); // Solta uma explosão de corações ao curtir!
+});
 
 document.getElementById('startBtn').onclick = () => {
   const card = document.querySelector('.card');
