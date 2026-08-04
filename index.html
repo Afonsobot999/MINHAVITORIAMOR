@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mensagem Especial</title>
 
+<!-- BIBLIOTECAS DO FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
 <style>
 body {
   margin: 0;
@@ -134,7 +138,6 @@ p {
   transform: translateY(-2px);
 }
 
-/* NOVOS ESTILOS DO BOTÃO DE AMEI */
 .like-container {
   display: flex;
   align-items: center;
@@ -178,62 +181,81 @@ p {
 <body>
 
 <script>
-// CORAÇÕES SUBINDO CONTINUAMENTE
+// ==========================================
+// 1. CONFIGURAÇÃO DO FIREBASE
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAWIxO1DfzzVZGnJqRroU9ljxro5S15wz4",
+  authDomain: "vitorina-f1c3e.firebaseapp.com",
+  databaseURL: "https://vitorina-f1c3e-default-rtdb.firebaseio.com",
+  projectId: "vitorina-f1c3e",
+  storageBucket: "vitorina-f1c3e.firebasestorage.app",
+  messagingSenderId: "529498111535",
+  appId: "1:529498111535:web:af5f34373c5b58f79bd0da",
+  measurementId: "G-2Y50VQ45BQ"
+};
+
+// Inicializa o Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const likesRef = database.ref('curtidasVitoria');
+
+// ==========================================
+// 2. LÓGICA DO CONTADOR COM FIREBASE
+// ==========================================
+let curtidas = 0;
+
+// Fica "escutando" o banco de dados
+likesRef.on('value', (snapshot) => {
+  const valorNoBanco = snapshot.val();
+  curtidas = valorNoBanco ? valorNoBanco : 0;
+  document.getElementById('contadorAmei').innerText = curtidas;
+});
+
+// Ação ao clicar no botão "Amei"
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnAmei').addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    // Salva o novo valor no banco de dados
+    likesRef.set(curtidas + 1);
+    
+    coracoesExplodindoCentro();
+  });
+});
+
+// ==========================================
+// 3. RESTANTE DO SEU CÓDIGO (FRASES E ANIMAÇÕES)
+// ==========================================
+
 setInterval(() => {
   const heart = document.createElement("div");
   heart.classList.add("heart");
   heart.innerHTML = "❤️";
-
   heart.style.left = Math.random() * 100 + "vw";
   heart.style.fontSize = (20 + Math.random() * 30) + "px";
   heart.style.animationDuration = (3 + Math.random() * 2) + "s";
-
   document.body.appendChild(heart);
   setTimeout(() => heart.remove(), 5000);
 }, 400);
 
-// CORAÇÕES AO CLICAR
 document.addEventListener("click", (e) => {
+  // Impede que o clique crie corações nos botões que já têm sua própria função
+  if(e.target.id === 'btnAmei' || e.target.id === 'startBtn') return;
+  
   const boom = document.createElement("div");
   boom.classList.add("heart");
   boom.innerHTML = "💖";
-
   boom.style.left = e.clientX + "px";
   boom.style.top = e.clientY + "px";
-  boom.style.bottom = "auto"; /* Corrige o conflito de posição */
+  boom.style.bottom = "auto";
   boom.style.position = "absolute";
   boom.style.animationDuration = (1 + Math.random()) + "s";
   boom.style.fontSize = (15 + Math.random() * 25) + "px";
-
   document.body.appendChild(boom);
   setTimeout(() => boom.remove(), 2000);
 });
-</script>
 
-<button id="startBtn" class="start" aria-label="Abrir mensagem surpresa">
-<span class="dog-emoji">🐶</span>
-</button>
-
-<div class="card">
-<h1 id="titulo"></h1>
-
-<p class="texto-fixo">
-Criei este site para guardar todos os detalhes que eu amo em você. Cada vez que percebo algo que me encanta — por menor que seja — eu venho aqui e acrescento.<br><br>
-É o meu jeito de eternizar esses momentos e, quem sabe, arrancar mais um sorriso seu.
-</p>
-
-<button onclick="novaFrase()" class="btn">Nova frase</button>
-<p id="frase"></p>
-
-<!-- NOVO: BOTÃO E CONTADOR DE AMEI -->
-<div class="like-container">
-  <button id="btnAmei" class="btn-like">❤️ Amei</button>
-  <span id="contadorAmei">0</span>
-</div>
-
-</div>
-
-<script>
 const frases = [
 "Eu amo quando você joga a cabeça pro lado pra tirar o cabelo dos olhos… é um gesto tão simples, mas eu acho a coisa mais linda do mundo.",
 "Eu acho muito daora quando você faz aquela mini dancinha quando come algo que gosta muito. Seu jeitinho espontâneo me faz sorrir na hora.",
@@ -253,18 +275,14 @@ const frases = [
 "O mundo lá fora é barulhento demais, mas o seu abraço é o único lugar que tem o silêncio e a paz que eu preciso."
 ];
 
-// VARIÁVEL PARA EVITAR REPETIÇÃO
 let ultimaFrase = "";
 
 function novaFrase() {
   let escolhida = frases[Math.floor(Math.random() * frases.length)];
-  
-  // CONTINUA SORTEANDO ATÉ SER DIFERENTE DA ÚLTIMA
   while (escolhida === ultimaFrase) {
     escolhida = frases[Math.floor(Math.random() * frases.length)];
   }
-  
-  ultimaFrase = escolhida; // Salva a nova frase para a próxima rodada
+  ultimaFrase = escolhida;
   document.getElementById('frase').innerText = escolhida;
 }
 
@@ -286,46 +304,56 @@ function coracoesExplodindoCentro() {
     const heart = document.createElement("div");
     heart.classList.add("heart");
     heart.innerHTML = "💖";
-
     heart.style.left = "50vw";
     heart.style.top = "50vh";
-    heart.style.bottom = "auto"; /* Corrige o conflito de posição */
+    heart.style.bottom = "auto";
     heart.style.position = "fixed";
     heart.style.animationDuration = (1 + Math.random()) + "s";
     heart.style.fontSize = (20 + Math.random() * 40) + "px";
-
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 2000);
   }
 }
 
-// LÓGICA DO CONTADOR DE AMEI
-let curtidas = 0;
-document.getElementById('btnAmei').addEventListener('click', (e) => {
-  e.stopPropagation(); // Evita que o clique do botão dispare o clique da tela toda junto
-  curtidas++;
-  document.getElementById('contadorAmei').innerText = curtidas;
-  coracoesExplodindoCentro(); // Solta uma explosão de corações ao curtir!
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('startBtn').onclick = () => {
+    const card = document.querySelector('.card');
+    const titulo = document.getElementById('titulo');
+
+    document.getElementById('startBtn').style.display = 'none';
+    card.style.display = "block";
+
+    card.style.animation = "none";
+    void card.offsetWidth;
+    card.style.animation = "abrirCaixa 0.8s ease forwards";
+
+    setTimeout(() => coracoesExplodindoCentro(), 300);
+
+    digitar("Oi Vitória ❤️", titulo, 160);
+    
+    setTimeout(novaFrase, 1500); 
+  };
 });
-
-document.getElementById('startBtn').onclick = () => {
-  const card = document.querySelector('.card');
-  const titulo = document.getElementById('titulo');
-
-  document.getElementById('startBtn').style.display = 'none';
-  card.style.display = "block";
-
-  card.style.animation = "none";
-  void card.offsetWidth;
-  card.style.animation = "abrirCaixa 0.8s ease forwards";
-
-  setTimeout(() => coracoesExplodindoCentro(), 300);
-
-  digitar("Oi Vitória ❤️", titulo, 160);
-  
-  setTimeout(novaFrase, 1500); 
-};
 </script>
 
+<button id="startBtn" class="start" aria-label="Abrir mensagem surpresa">
+<span class="dog-emoji">🐶</span>
+</button>
+
+<div class="card">
+<h1 id="titulo"></h1>
+<p class="texto-fixo">
+Criei este site para guardar todos os detalhes que eu amo em você. Cada vez que percebo algo que me encanta — por menor que seja — eu venho aqui e acrescento.<br><br>
+É o meu jeito de eternizar esses momentos e, quem sabe, arrancar mais um sorriso seu.
+</p>
+<button onclick="novaFrase()" class="btn">Nova frase</button>
+<p id="frase"></p>
+
+<div class="like-container">
+  <button id="btnAmei" class="btn-like">❤️ Amei</button>
+  <span id="contadorAmei">0</span>
+</div>
+
+</div>
 </body>
 </html>
