@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mensagem Especial</title>
 
-<!-- BIBLIOTECAS DO FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 <style>
 body {
   margin: 0;
@@ -137,97 +133,11 @@ p {
   background: #b73b5e;
   transform: translateY(-2px);
 }
-
-.like-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 25px;
-}
-
-.btn-like {
-  background: transparent;
-  border: 2px solid #d14d72;
-  border-radius: 20px;
-  padding: 8px 20px;
-  font-size: 18px;
-  color: #d14d72;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.btn-like:hover {
-  background: #d14d72;
-  color: white;
-  transform: scale(1.05);
-}
-
-#contadorAmei {
-  font-size: 18px;
-  color: #d14d72;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.6);
-  padding: 5px 12px;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
 </style>
 </head>
 <body>
 
 <script>
-// ==========================================
-// 1. CONFIGURAÇÃO DO FIREBASE
-// ==========================================
-const firebaseConfig = {
-  apiKey: "AIzaSyAWIxO1DfzzVZGnJqRroU9ljxro5S15wz4",
-  authDomain: "vitorina-f1c3e.firebaseapp.com",
-  databaseURL: "https://vitorina-f1c3e-default-rtdb.firebaseio.com",
-  projectId: "vitorina-f1c3e",
-  storageBucket: "vitorina-f1c3e.firebasestorage.app",
-  messagingSenderId: "529498111535",
-  appId: "1:529498111535:web:af5f34373c5b58f79bd0da",
-  measurementId: "G-2Y50VQ45BQ"
-};
-
-// Inicializa o Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-const likesRef = database.ref('curtidasVitoria');
-
-// ==========================================
-// 2. LÓGICA DO CONTADOR COM FIREBASE
-// ==========================================
-let curtidas = 0;
-
-// Fica "escutando" o banco de dados
-likesRef.on('value', (snapshot) => {
-  const valorNoBanco = snapshot.val();
-  curtidas = valorNoBanco ? valorNoBanco : 0;
-  document.getElementById('contadorAmei').innerText = curtidas;
-});
-
-// Ação ao clicar no botão "Amei"
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('btnAmei').addEventListener('click', (e) => {
-    e.stopPropagation();
-    
-    // Salva o novo valor no banco de dados
-    likesRef.set(curtidas + 1);
-    
-    coracoesExplodindoCentro();
-  });
-});
-
-// ==========================================
-// 3. RESTANTE DO SEU CÓDIGO (FRASES E ANIMAÇÕES)
-// ==========================================
-
 setInterval(() => {
   const heart = document.createElement("div");
   heart.classList.add("heart");
@@ -240,8 +150,8 @@ setInterval(() => {
 }, 400);
 
 document.addEventListener("click", (e) => {
-  // Impede que o clique crie corações nos botões que já têm sua própria função
-  if(e.target.id === 'btnAmei' || e.target.id === 'startBtn') return;
+  // Impede que o clique crie corações no botão que já tem sua própria função
+  if(e.target.id === 'startBtn') return;
   
   const boom = document.createElement("div");
   boom.classList.add("heart");
@@ -272,7 +182,10 @@ const frases = [
 "Eu amo o jeito que você me olha, parece que você consegue ler o que eu tô sentindo sem eu precisar falar nada.",
 "Engraçado como antes de você eu achava que sabia o que era paz, mas agora eu sei que a paz tem o seu nome.",
 "Eu quero ser o seu porto seguro, o lugar onde você pode soltar todo o peso do mundo e só descansar.",
-"O mundo lá fora é barulhento demais, mas o seu abraço é o único lugar que tem o silêncio e a paz que eu preciso."
+"O mundo lá fora é barulhento demais, mas o seu abraço é o único lugar que tem o silêncio e a paz que eu preciso.",
+"Percebi que seus olhos têm ficado mais bonitos, difícil não se hipnotizar por eles.",
+"Fico me perguntando por que seu cabelo me chama tanta atenção, eu não entendo o porquê do meu fascínio por ele.",
+"Às vezes, quando eu fecho os olhos, eu me lembro de você sentada em cima da mesa de conferência balançando as pernas. É uma imagem que me traz uma certa paz e felicidade que eu não sei explicar."
 ];
 
 let ultimaFrase = "";
@@ -348,12 +261,6 @@ Criei este site para guardar todos os detalhes que eu amo em você. Cada vez que
 </p>
 <button onclick="novaFrase()" class="btn">Nova frase</button>
 <p id="frase"></p>
-
-<div class="like-container">
-  <button id="btnAmei" class="btn-like">❤️ Amei</button>
-  <span id="contadorAmei">0</span>
-</div>
-
 </div>
 </body>
 </html>
