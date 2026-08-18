@@ -202,14 +202,22 @@ const frases = [
 "Toda vez que me dá vontade de comer sushi, eu percebo que, na verdade, é vontade de passar um tempo com você."
 ];
 
-let ultimaFrase = "";
+// Cria uma cópia da lista de frases para sabermos quais ainda não foram lidas
+let frasesDisponiveis = [...frases];
 
 function novaFrase() {
-  let escolhida = frases[Math.floor(Math.random() * frases.length)];
-  while (escolhida === ultimaFrase) {
-    escolhida = frases[Math.floor(Math.random() * frases.length)];
+  // Se as frases disponíveis acabarem, recarrega a lista completa
+  if (frasesDisponiveis.length === 0) {
+    frasesDisponiveis = [...frases];
   }
-  ultimaFrase = escolhida;
+
+  // Sorteia um número baseado apenas na quantidade de frases que ainda restam
+  const indexSorteado = Math.floor(Math.random() * frasesDisponiveis.length);
+  
+  // Pega a frase sorteada e a remove da lista de disponíveis (usando splice)
+  const escolhida = frasesDisponiveis.splice(indexSorteado, 1)[0];
+  
+  // Exibe a frase na tela
   document.getElementById('frase').innerText = escolhida;
 }
 
